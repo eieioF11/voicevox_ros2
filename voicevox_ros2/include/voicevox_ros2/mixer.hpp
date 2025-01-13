@@ -31,6 +31,10 @@ public:
     channels_[Mix_PlayChannel(-1, chunk, 0)] = chunk;
   }
 
+  bool is_playing() {
+    return Mix_Playing(-1) != 0;
+  }
+
   void enqueue(Mix_Chunk *chunk) {
     if (queue_.empty() && Mix_Playing(-1) == 0) {
       play(chunk);

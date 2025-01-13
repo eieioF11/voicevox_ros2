@@ -31,6 +31,7 @@
 
 #include "mixer.hpp"
 
+using namespace std::chrono_literals;
 namespace tutrobo {
 class VoicevoxRos2 : public rclcpp::Node {
 public:
@@ -133,6 +134,9 @@ private:
       mixer.enqueue(Mix_QuickLoad_WAV(wav));
     } else {
       mixer.play(Mix_QuickLoad_WAV(wav));
+      RCLCPP_INFO(this->get_logger(), "Playing...");
+      while (mixer.is_playing());
+      RCLCPP_INFO(this->get_logger(), "Play end.");
     }
     speak_pub_->publish(make_bool(false));
   }
