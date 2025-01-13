@@ -19,6 +19,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(voicevox_core_vendor REQUIRED)
 find_package(voicevox_ros2_msgs REQUIRED)
 
@@ -32,6 +33,7 @@ target_link_libraries(${PROJECT_NAME}_component
 ament_target_dependencies(${PROJECT_NAME}_component
   rclcpp
   rclcpp_components
+  std_msgs
   voicevox_core_vendor
   voicevox_ros2_msgs
 )
@@ -45,6 +47,7 @@ ament_export_targets(export_${PROJECT_NAME}_component HAS_LIBRARY_TARGET)
 ament_export_dependencies(
   rclcpp
   rclcpp_components
+  std_msgs
   voicevox_core_vendor
   voicevox_ros2_msgs
 )
