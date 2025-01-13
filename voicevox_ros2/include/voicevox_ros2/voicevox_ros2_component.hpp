@@ -20,6 +20,7 @@
 #include <vector>
 
 #include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/bool.hpp>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
@@ -72,6 +73,8 @@ public:
     Mix_OpenAudio(24000, AUDIO_S16LSB, 1, 4096);
     Mix_ChannelFinished([](int channel) { mixer.stop(channel); });
 
+    // パブリッシャ
+    speak_pub_ = this->create_publisher<std_msgs::msg::Bool>("voicevox_ros2/speak", 10);
     // サブスクライバ
     voicevox_ros2_sub_ =
         this->create_subscription<voicevox_ros2_msgs::msg::Talk>(
@@ -94,14 +97,23 @@ public:
 private:
   rclcpp::Subscription<voicevox_ros2_msgs::msg::Talk>::SharedPtr
       voicevox_ros2_sub_;
+  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr speak_pub_;
 
   static inline Mixer mixer;
 
+  std_msgs::msg::Bool make_bool(bool data) {
+    std_msgs::msg::Bool msg;
+    msg.data = data;
+    return msg;
+  }
+
   void
   voicevox_ros2_callback(const voicevox_ros2_msgs::msg::Talk::SharedPtr msg) {
+    speak_pub_->publish(make_bool(true));
     if (!voicevox_is_model_loaded(msg->speaker_id)) {
       RCLCPP_ERROR(this->get_logger(), "Model id %d is not loaded.",
                    msg->speaker_id);
+      speak_pub_->publish(make_bool(false));
       return;
     }
 
@@ -122,6 +134,7 @@ private:
     } else {
       mixer.play(Mix_QuickLoad_WAV(wav));
     }
+    speak_pub_->publish(make_bool(false));
   }
 };
 } // namespace tutrobo
